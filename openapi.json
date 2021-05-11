@@ -1,0 +1,864 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "ShippingRates",
+        "version": "1.0.0",
+        "description": "The Shipping Rates API allows you to request a list of shipping quotes for a prospective Shipment. The response will also indicate which Courier is the cheapest, fastest and best value for money, which is a combination of speed, price and reliability.",
+        "contact": {
+            "name": "FreightBro HelpDesk",
+            "url": "https://api.freightbro.com/",
+            "email": "support@frieghtbro.com"
+        }
+    },
+    "paths": {
+        "/rates": {
+            "summary": "To Define rates for a shipping process",
+            "description": "To Define rates for a shipping process",
+            "post": {
+                "requestBody": {
+                    "description": "Quote request details",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuotesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Rates"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/QuotesResponse"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "The requested rate details are retrieved successfully"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Error400"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/Error500"
+                    }
+                },
+                "summary": "To request rate for a quote",
+                "description": "To make a POST call to get shipping rates for your multiple carrier and service options."
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Insurance": {
+                "title": "Root Type for Insurance",
+                "description": "Particulars of insurance details are given here",
+                "type": "object",
+                "properties": {
+                    "isInsured": {
+                        "description": "Status of the insurance\n\nDefault: False",
+                        "type": "boolean"
+                    },
+                    "insuredAmount": {
+                        "format": "float",
+                        "description": "Amount to insure with FrightBro's insurance provider. If not specified, we'll use the sum of customs values and shipping cost\n\nLenght: 4",
+                        "type": "number"
+                    },
+                    "insuredCurrency": {
+                        "description": "Currency for the insured amount. If not specified, the account's origin country currency will be used.\n\nLength: 40",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "isInsured": false,
+                    "insuredAmount": 93.54,
+                    "insuredCurrency": "some text"
+                }
+            },
+            "ShippingSettings": {
+                "title": "Root Type for ShippingSettings",
+                "description": "Package properties like units of weight,dimension and output currency can be set here",
+                "type": "object",
+                "properties": {
+                    "units": {
+                        "$ref": "#/components/schemas/Units",
+                        "description": "Units"
+                    },
+                    "outputCurrrency": {
+                        "description": "Output currency (Default: Origin Country Currency)",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "units": "",
+                    "outputCurrrency": ""
+                }
+            },
+            "Units": {
+                "title": "Root Type for Units",
+                "description": "Properties of the package",
+                "type": "object",
+                "properties": {
+                    "weight": {
+                        "description": "Unit of weight values provided. Options: kg / g / lb / oz (Default: kg). Unit of values in the response will be in kg.",
+                        "type": "string"
+                    },
+                    "dimension": {
+                        "description": "Unit of dimension values provided. Options: cm / in (Default: cm) Unit of values in the response will be in cm.",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "weight": "some text",
+                    "dimension": "some text"
+                }
+            },
+            "Box": {
+                "title": "Root Type for Box",
+                "description": "Box Dimensions",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "Name of the box\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "length": {
+                        "description": "Length of the Box\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "width": {
+                        "description": "width of the box\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "height": {
+                        "description": "Height of the Box\n\nLength: 10",
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "name": "some text",
+                    "length": 68,
+                    "width": 76,
+                    "height": 18
+                }
+            },
+            "QuotesRequest": {
+                "title": "Root Type for RatesRequest",
+                "description": "Shipping quote properties",
+                "required": [
+                    "shipFrom",
+                    "shipTo"
+                ],
+                "type": "object",
+                "properties": {
+                    "incoTerms": {
+                        "description": "Terms of Sale. Accepts either DDU (or) DDP (Default: DDU)\nDelivered Duty Unpaid (DDU)\nDelivered Duty paid (DDP)",
+                        "type": "string"
+                    },
+                    "insurance": {
+                        "$ref": "#/components/schemas/Insurance",
+                        "description": "Insurance details are given here"
+                    },
+                    "applyShippingRules": {
+                        "description": "Apply any shipping rules created on the freightbro dashboard (Default: true)",
+                        "type": "boolean"
+                    },
+                    "shippingSettings": {
+                        "$ref": "#/components/schemas/ShippingSettings",
+                        "description": "To specify the shipping setting"
+                    },
+                    "parcels": {
+                        "description": "Package details",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Parcel"
+                        }
+                    },
+                    "shipFrom": {
+                        "$ref": "#/components/schemas/ShipFromAddress",
+                        "description": "Origin address details are given here"
+                    },
+                    "shipTo": {
+                        "$ref": "#/components/schemas/ShipToAddress",
+                        "description": "destination address details"
+                    }
+                },
+                "example": {
+                    "incoTerms": "some text",
+                    "insurance": {
+                        "isInsured": true,
+                        "insuredAmount": 32.81,
+                        "insuredCurrency": "some text"
+                    },
+                    "applyShippingRules": true,
+                    "shippingSettings": {
+                        "units": {
+                            "weight": "some text",
+                            "dimension": "some text"
+                        },
+                        "outputCurrrency": "some text"
+                    },
+                    "parcels": [
+                        {
+                            "totalActualWeight": 22.18,
+                            "box": {
+                                "slug": "some text",
+                                "length": 49.29,
+                                "width": 19.94,
+                                "height": 16.71
+                            },
+                            "items": [
+                                {
+                                    "quantity": "some text",
+                                    "category": "some text",
+                                    "description": "some text",
+                                    "sku": "some text",
+                                    "actualWeight": "some text",
+                                    "declaredCurrency": "some text",
+                                    "declaredCustomsValue": "some text",
+                                    "dimensions": {
+                                        "length": 37.82,
+                                        "width": 95.79,
+                                        "height": 31.2
+                                    }
+                                },
+                                {
+                                    "quantity": "some text",
+                                    "category": "some text",
+                                    "description": "some text",
+                                    "sku": "some text",
+                                    "actualWeight": "some text",
+                                    "declaredCurrency": "some text",
+                                    "declaredCustomsValue": "some text",
+                                    "dimensions": {
+                                        "length": 27.59,
+                                        "width": 42.98,
+                                        "height": 82.58
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "totalActualWeight": 58.91,
+                            "box": {
+                                "slug": "some text",
+                                "length": 82.56,
+                                "width": 1.74,
+                                "height": 0.71
+                            },
+                            "items": [
+                                {
+                                    "quantity": "some text",
+                                    "category": "some text",
+                                    "description": "some text",
+                                    "sku": "some text",
+                                    "actualWeight": "some text",
+                                    "declaredCurrency": "some text",
+                                    "declaredCustomsValue": "some text",
+                                    "dimensions": {
+                                        "length": 52.86,
+                                        "width": 15.15,
+                                        "height": 22.98
+                                    }
+                                },
+                                {
+                                    "quantity": "some text",
+                                    "category": "some text",
+                                    "description": "some text",
+                                    "sku": "some text",
+                                    "actualWeight": "some text",
+                                    "declaredCurrency": "some text",
+                                    "declaredCustomsValue": "some text",
+                                    "dimensions": {
+                                        "length": 35.66,
+                                        "width": 65.51,
+                                        "height": 79.43
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "shipFrom": {
+                        "address": "some text",
+                        "city": "some text",
+                        "state": "some text",
+                        "country": "some text",
+                        "postalCode": "some text",
+                        "companyName": "some text",
+                        "contactName": "some text",
+                        "contactMobileNumber": "some text",
+                        "contactEmailId": "some text"
+                    },
+                    "shipTo": {
+                        "address": "some text",
+                        "city": "some text",
+                        "state": "some text",
+                        "country": "some text",
+                        "postalCode": "some text",
+                        "companyName": "some text",
+                        "contactName": "some text",
+                        "contactMobileNumber": "some text",
+                        "contactEmailId": "some text"
+                    }
+                }
+            },
+            "QuotesResponse": {
+                "title": "Root Type for QuoteResponse",
+                "description": "Requested details per courier ",
+                "type": "object",
+                "properties": {
+                    "courierId": {
+                        "description": "Courier Identity code\n\nLength: 100",
+                        "type": "string"
+                    },
+                    "courierName": {
+                        "description": "Name of the courier\n\nLength: 100",
+                        "type": "string"
+                    },
+                    "minimumDeliveryTime": {
+                        "description": "Minimum Delivery Time\n\nLength: 2",
+                        "type": "integer"
+                    },
+                    "maximumDeliveryTime": {
+                        "description": "Maximum Delivery Time\n\nLength: 2",
+                        "type": "integer"
+                    },
+                    "deliveryTimeRank": {
+                        "description": "For time based deliveries, your rank depends on how fast you take to complete the delivery. This value can be rated from 1 to 10.\n\n\nLength: 2",
+                        "type": "integer"
+                    },
+                    "shipmentCharge": {
+                        "format": "double",
+                        "description": "The shipping fee is the cost used to ship items to a buyer\n\nLength: 10",
+                        "type": "number"
+                    },
+                    "fuelSurcharge": {
+                        "description": "Fuel Surcharge \n\nLength: 20",
+                        "type": "integer"
+                    },
+                    "remoteAreaSurcharge": {
+                        "description": "A Remote Area Surcharge is applied per shipment when the domestic or international delivery destination or pick up location is remote.\n\nLength: 10",
+                        "type": "string"
+                    },
+                    "shipmentChargeTotal": {
+                        "format": "double",
+                        "description": "Shipping Total charge",
+                        "type": "number"
+                    },
+                    "warehouseHandlingFee": {
+                        "description": "Costs associated with the equipment used to handle product in the warehouse\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "insuranceFee": {
+                        "description": "The amount of money an individual or business pays for an insurance policy\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "ddpHandlingFee": {
+                        "description": "Cost of the delivery duty paid\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "importTaxCharge": {
+                        "description": "Import Tax Charge\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "importDutyCharge": {
+                        "description": "Import Duty Charge:The tax imposed on the import of goods\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "totalCharge": {
+                        "format": "double",
+                        "description": "Total Charge",
+                        "type": "number"
+                    },
+                    "isAboveThreshold": {
+                        "description": "states if above the threshold or not",
+                        "type": "boolean"
+                    },
+                    "effectiveIncoterms": {
+                        "description": "Terms of Sale cab be : DDU or DDP\nDDU means Delivered Duty Unpaid. DDP means Delivered Duty Paid\n\nLength: 4",
+                        "type": "string"
+                    },
+                    "estimatedImportTax": {
+                        "description": "Estimated Import Tax Charges\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "estimatedImportDuty": {
+                        "description": "Estimated Import duty charges\n\nLength: 10",
+                        "type": "integer"
+                    },
+                    "courierDoesPickup": {
+                        "description": "States whether courier does pickup or not",
+                        "type": "boolean"
+                    },
+                    "courierDropoffURL": {
+                        "description": "Dropoff URL detail ",
+                        "type": "string"
+                    },
+                    "trackingRating": {
+                        "description": "Tracking Rating",
+                        "type": "integer"
+                    },
+                    "paymentRecipient": {
+                        "description": "An individual, company or organisation who is engaged by You to provide goods or services to You and in return receives payment from You\n\nLenght: 10",
+                        "type": "string"
+                    },
+                    "courierRemarks": {
+                        "description": "To write extra comments\n\nLength: 500",
+                        "type": "string"
+                    },
+                    "currency": {
+                        "description": "Currency based on the destination place\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "box": {
+                        "$ref": "#/components/schemas/Box",
+                        "description": "Box Dimension details\n",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "length": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "width": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "height": {
+                                "format": "int32",
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "minimumPickupFee": {
+                        "type": "integer"
+                    },
+                    "description": {
+                        "description": "Brief description of the courier details\n\nLength: 200",
+                        "type": "string"
+                    },
+                    "fullDescription": {
+                        "description": "Detailed description of the courier details\n\nLength: 2000",
+                        "type": "string"
+                    },
+                    "valueForMoneyRank": {
+                        "description": "Value for Money based on the Rank\n\nLength:10",
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "courierId": "3dkhkd-kk1l-hdk3-ds97-jd18ykdn",
+                    "courierName": "America Post - ePack",
+                    "minimumDeliveryTime": 5,
+                    "maximumDeliveryTime": 7,
+                    "valueForMoney_rank": 2,
+                    "deliveryTimeRank": 7,
+                    "shipmentCharge": 30.38,
+                    "fuelSurcharge": 0,
+                    "shipmentChargeTotal": 30.38,
+                    "warehouseHandlingFee": 0,
+                    "insuranceFee": 0,
+                    "ddpHandlingFee": 0,
+                    "importTaxCharge": 0,
+                    "importDutyCharge": 0,
+                    "totalCharge": 30.38,
+                    "isAboveThreshold": false,
+                    "effectiveIncoterms": "DDU",
+                    "estimatedImportTax": 0,
+                    "estimatedImportDuty": 0,
+                    "courierDoesPickup": false,
+                    "courierDropoffURL": "https://www.frieghtbro.com/drop-off/directlink/us",
+                    "trackingRating": 2,
+                    "paymentRecipient": "FrieghBro",
+                    "currency": "USD",
+                    "box": {
+                        "length": 20,
+                        "width": 15,
+                        "height": 10
+                    },
+                    "minimumPickupFee": 0
+                }
+            },
+            "ShipFromAddress": {
+                "title": "Root Type for OriginAddress",
+                "description": "Particulars of a from address details are given here",
+                "required": [
+                    "city",
+                    "country",
+                    "postalCode",
+                    "state"
+                ],
+                "type": "object",
+                "properties": {
+                    "address": {
+                        "description": "Address which includes street, blocks and area\n\nLength: 80",
+                        "type": "string"
+                    },
+                    "city": {
+                        "description": "City or Suburb\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "State\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "country": {
+                        "description": "Country\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "postalCode": {
+                        "description": "Postal Code\n\nLength: 10",
+                        "type": "string"
+                    },
+                    "companyName": {
+                        "description": "Company Name\n\nLength: 100",
+                        "type": "string"
+                    },
+                    "contactName": {
+                        "description": "Contact person Name\n\nLength: 30",
+                        "type": "string"
+                    },
+                    "contactMobileNumber": {
+                        "description": "Sender's contact number - can be mobile number or land-line number\n\nLength: 25",
+                        "type": "string"
+                    },
+                    "contactEmailId": {
+                        "description": "Sender's Email Id\n\nLength: 100",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "address": "some text",
+                    "city": "some text",
+                    "state": "some text",
+                    "country": "some text",
+                    "postalCode": "some text",
+                    "companyName": "some text",
+                    "contactName": "some text",
+                    "contactMobileNumber": "some text",
+                    "contactEmailId": "some text"
+                }
+            },
+            "ShipToAddress": {
+                "title": "Root Type for OriginAddress",
+                "description": "Particulars of a destination address details are given here",
+                "required": [
+                    "city",
+                    "country",
+                    "postalCode",
+                    "state"
+                ],
+                "type": "object",
+                "properties": {
+                    "address": {
+                        "description": "Address which includes street, blocks and area\n\nLength: 80",
+                        "type": "string"
+                    },
+                    "city": {
+                        "description": "City or Suburb\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "state": {
+                        "description": "State\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "country": {
+                        "description": "Country\n\nLength: 50",
+                        "type": "string"
+                    },
+                    "postalCode": {
+                        "description": "Postal Code\n\nLength: 10",
+                        "type": "string"
+                    },
+                    "companyName": {
+                        "description": "Company Name\n\nLength: 100",
+                        "type": "string"
+                    },
+                    "contactName": {
+                        "description": "Contact person Name\n\nLength: 30",
+                        "type": "string"
+                    },
+                    "contactMobileNumber": {
+                        "description": "Sender's contact number - can be mobile number or land-line number\n\nLength: 25",
+                        "type": "string"
+                    },
+                    "contactEmailId": {
+                        "description": "Sender's Email Id\n\nLength: 100",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "address": "some text",
+                    "city": "some text",
+                    "state": "some text",
+                    "country": "some text",
+                    "postalCode": "some text",
+                    "companyName": "some text",
+                    "contactName": "some text",
+                    "contactMobileNumber": "some text",
+                    "contactEmailId": "some text"
+                }
+            },
+            "Parcel": {
+                "title": "Root Type for Parcel",
+                "description": "To create new packages clearly defining the properties of the parcels, e.g., size and weight.",
+                "type": "object",
+                "properties": {
+                    "totalActualWeight": {
+                        "description": "Total weight of the shipment, including the box weight. If you provide the total weight of the shipment, then the weight for items can be optional.\r\n\r\n",
+                        "type": "number"
+                    },
+                    "box": {
+                        "$ref": "#/components/schemas/BoxDimensions",
+                        "description": "The box dimensions for the shipment. If the box dimensions are provided, then dimensions for items can be optional"
+                    },
+                    "items": {
+                        "description": "Items details to be parcelled",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Item"
+                        }
+                    }
+                },
+                "example": {
+                    "totalActualWeight": 56.09,
+                    "box": {
+                        "slug": "some text",
+                        "length": 8.22,
+                        "width": 62.91,
+                        "height": 43.98
+                    },
+                    "items": [
+                        {
+                            "quantity": "some text",
+                            "category": "some text",
+                            "description": "some text",
+                            "sku": "some text",
+                            "actualWeight": "some text",
+                            "declaredCurrency": "some text",
+                            "declaredCustomsValue": "some text",
+                            "dimensions": {
+                                "length": 74.98,
+                                "width": 34.15,
+                                "height": 21.92
+                            }
+                        },
+                        {
+                            "quantity": "some text",
+                            "category": "some text",
+                            "description": "some text",
+                            "sku": "some text",
+                            "actualWeight": "some text",
+                            "declaredCurrency": "some text",
+                            "declaredCustomsValue": "some text",
+                            "dimensions": {
+                                "length": 25.85,
+                                "width": 54.11,
+                                "height": 80.16
+                            }
+                        }
+                    ]
+                }
+            },
+            "BoxDimensions": {
+                "title": "Root Type for BoxDimensions",
+                "description": "Dimenstion of the parcel box",
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "description": "Courier or Custom Box Slug. ",
+                        "type": "string"
+                    },
+                    "length": {
+                        "description": "Length of the box\n\n",
+                        "type": "number"
+                    },
+                    "width": {
+                        "description": "Width of the box",
+                        "type": "number"
+                    },
+                    "height": {
+                        "description": "Height of the box",
+                        "type": "number"
+                    }
+                },
+                "example": {
+                    "slug": "some text",
+                    "length": 57.24,
+                    "width": 91.93,
+                    "height": 94.26
+                }
+            },
+            "Item": {
+                "title": "Root Type for Item",
+                "description": "Item details",
+                "type": "object",
+                "properties": {
+                    "quantity": {
+                        "description": "Item quantity (Default: 1)",
+                        "type": "string"
+                    },
+                    "category": {
+                        "description": "Item category",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Item description.",
+                        "type": "string"
+                    },
+                    "sku": {
+                        "description": "Item Stock Keeping Unit (SKU) as listed in your store.",
+                        "type": "string"
+                    },
+                    "actualWeight": {
+                        "description": "Item actual weight in kg, must be greater than 0; Optional if totalActualWeight is provided",
+                        "type": "string"
+                    },
+                    "declaredCurrency": {
+                        "description": "Item customs value currency",
+                        "type": "string"
+                    },
+                    "declaredCustomsValue": {
+                        "description": "Item customs value, must be greater than 0 unless category is documents",
+                        "type": "string"
+                    },
+                    "dimensions": {
+                        "$ref": "#/components/schemas/ItemDimensions",
+                        "description": "Dimensions"
+                    }
+                },
+                "example": {
+                    "quantity": "",
+                    "category": "",
+                    "description": "",
+                    "sku": "",
+                    "actualWeight": "",
+                    "declaredCurrency": "",
+                    "declaredCustomsValue": "",
+                    "dimensions": ""
+                }
+            },
+            "ItemDimensions": {
+                "title": "Root Type for ItemDimensions",
+                "description": "Dimensions of the par{}celing item",
+                "type": "object",
+                "properties": {
+                    "length": {
+                        "description": "Item length; Optional if the Box dimensions are provided",
+                        "type": "number"
+                    },
+                    "width": {
+                        "description": "Item width; Optional if the Box dimensions are provided",
+                        "type": "number"
+                    },
+                    "height": {
+                        "description": "Item height; Optional if the Box dimensions are provided",
+                        "type": "number"
+                    }
+                },
+                "example": {
+                    "length": 53.13,
+                    "width": 54.04,
+                    "height": 15.14
+                }
+            },
+            "APIError": {
+                "title": "Root Type for APIError",
+                "description": "Error Object",
+                "type": "object",
+                "properties": {
+                    "seqNo": {
+                        "format": "int32",
+                        "description": "Error Sequence Number",
+                        "type": "integer"
+                    },
+                    "id": {
+                        "format": "int32",
+                        "description": "Error ID",
+                        "type": "integer"
+                    },
+                    "source": {
+                        "description": "Error Source",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Error Description",
+                        "type": "string"
+                    },
+                    "correctiveAction": {
+                        "description": "Error CorrectiveAction",
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "seqNo": 47,
+                    "id": 84,
+                    "source": "some text",
+                    "description": "some text",
+                    "correctiveAction": "some text"
+                }
+            },
+            "APIErrors": {
+                "title": "Root Type for APIErrors",
+                "description": "List of Error Objects",
+                "type": "object",
+                "properties": {
+                    "APIException": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/APIError"
+                        }
+                    }
+                },
+                "example": {
+                    "APIException": [
+                        {
+                            "seqNo": 76,
+                            "id": 38,
+                            "source": "some text",
+                            "description": "some text",
+                            "correctiveAction": "some text"
+                        },
+                        {
+                            "seqNo": 52,
+                            "id": 0,
+                            "source": "some text",
+                            "description": "some text",
+                            "correctiveAction": "some text"
+                        }
+                    ]
+                }
+            }
+        },
+        "responses": {
+            "Error400": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/APIErrors"
+                        }
+                    }
+                },
+                "description": "BAD DATA"
+            },
+            "Error500": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/APIErrors"
+                        }
+                    }
+                },
+                "description": "INVALID REQUEST"
+            }
+        }
+    }
+}

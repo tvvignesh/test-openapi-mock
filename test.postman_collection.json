@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "3656ca07-cf95-4097-a11d-f4f1e2a21516",
+		"name": "test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Rates API",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"shipFrom\": {\r\n\t\t\"address\": \"No.30, Veeramani Nagar, Chennai - 600129\",\r\n\t\t\"city\": \"Chennai\",\r\n\t\t\"state\": \"Tamil Nadu\",\r\n\t\t\"country\": \"INDIA\",\r\n\t\t\"postalCode\": \"600129\",\r\n\t\t\"companyName\": \"Freightbro\",\r\n\t\t\"contactName\": \"Santhosh\",\r\n\t\t\"contactMobileNumber\": \"123456789\",\r\n\t\t\"contactEmailId\": \"cusanthosh@yahoo.co.in\"\r\n\t},\r\n\t\"shipTo\": {\r\n\t\t\"address\": \"some text\",\r\n\t\t\"city\": \"some text\",\r\n\t\t\"state\": \"some text\",\r\n\t\t\"country\": \"some text\",\r\n\t\t\"postalCode\": \"some text\",\r\n\t\t\"companyName\": \"some text\",\r\n\t\t\"contactName\": \"some text\",\r\n\t\t\"contactMobileNumber\": \"some text\",\r\n\t\t\"contactEmailId\": \"some text\"\r\n\t}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/rates",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"rates"
+					]
+				},
+				"description": "http://localhost:5001/rates"
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "test-openapi-mock",
+  "version": "1.0.0",
+  "description": "Testing Open API Mock server",
+  "main": "index.js",
+  "scripts": {
+    "mock:watch": "open-api-mocker -s openapi.json -w",
+    "mock:sample": "open-api-mocker -s sample.yml -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tvvignesh/test-openapi-mock.git"
+  },
+  "author": "Vignesh T.V.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tvvignesh/test-openapi-mock/issues"
+  },
+  "homepage": "https://github.com/tvvignesh/test-openapi-mock#readme",
+  "dependencies": {
+    "open-api-mocker": "^1.7.0"
+  }
+}
